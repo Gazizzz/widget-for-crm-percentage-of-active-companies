@@ -54,6 +54,9 @@ let monthsWithQuoter = {
 //  arrDatefrom;
 // что возвращаем  - return quarter
 
+let date = new Date();
+const formattedDate = dateFns.format(date, "dd.MM.yyyy");
+
 function findMonthQuarter(date) {
   let arrDataWithoutDot = date.split(".");
   let [day, month, year] = arrDataWithoutDot;
@@ -66,98 +69,54 @@ function findMonthQuarter(date) {
   return findQuarter;
 }
 
-let quaterFrom = findMonthQuarter(strDatefrom);
-let quarterTo = findMonthQuarter(strDateto);
-console.log(quaterFrom);
-console.log(quarterTo);
-
-// (man[i].summ / 100) * 1(man[i].summ / 100) * 1;
-
-// let test1 = document.querySelector(".precent");
-// let test3 = document.querySelector(".sum");
-
-// function test2() {
-//     for (let i=0; i < )
-//   if (test1.innerHTML <= 10) {
-//     let test4 = (test3.innerHTML / 100) * 1;
-//     console.log(test4);
-//   }
-// };
-// test2();
-
 const period = url.searchParams.get("period");
 
-let postDataFilterDate = {
-  type: "filter_leads",
-  data: {
-    from: "",
+const currentDate = new Date();
+let currentQuater = findMonthQuarter(formattedDate);
+console.log(currentQuater);
+function quarterCurrent() {
+  if (currentQuater === 1) {
+    let dateFrom = new Date(currentDate.getFullYear(), 0, 1);
+    let timestamptDateFrom = dateFrom.getTime() / 1000;
 
-    to: function () {
-      if (period == "day") {
-        return "1682083862";
-      }
-    },
-    manager_id: "",
-  },
+    let dateTo = new Date(currentDate.getFullYear(), 2, 31);
+    let timestamptDateTo = dateTo.getTime() / 1000;
+
+    return { timestamptDateFrom, timestamptDateTo };
+  }
+  if (currentQuater === 2) {
+    let dateFrom = new Date(currentDate.getFullYear(), 3, 1);
+    let timestamptDateFrom = dateFrom.getTime() / 1000;
+
+    let dateTo = new Date(currentDate.getFullYear(), 5, 30);
+    let timestamptDateTo = dateTo.getTime() / 1000;
+
+    return { timestamptDateFrom, timestamptDateTo };
+  }
+  if (currentQuater === 3) {
+    let dateFrom = new Date(currentDate.getFullYear(), 6, 1);
+    let timestamptDateFrom = dateFrom.getTime() / 1000;
+
+    let dateTo = new Date(currentDate.getFullYear(), 8, 30);
+    let timestamptDateTo = dateTo.getTime() / 1000;
+
+    return { timestamptDateFrom, timestamptDateTo };
+  }
+  if (currentQuater === 4) {
+    let dateFrom = new Date(currentDate.getFullYear(), 9, 1);
+    let timestamptDateFrom = dateFrom.getTime() / 1000;
+
+    let dateTo = new Date(currentDate.getFullYear(), 11, 31);
+    let timestamptDateTo = dateTo.getTime() / 1000;
+
+    return { timestamptDateFrom, timestamptDateTo };
+  }
+}
+
+let filterDateParams = {
+  from: quarterCurrent().timestamptDateFrom,
+  to: quarterCurrent().timestamptDateTo,
 };
-
-let postDataFilterDateComplete = {
-  type: "filter_complete_leads",
-  data: {
-    table: "complete_leads_info",
-    from: function () {
-      if (period == "day") {
-        return periodDay()[0];
-      }
-      if (period == "yesterday") {
-        return yesterday()[0];
-      }
-      if (period == "week") {
-        return startEndWeek()[0];
-      }
-      if (period == "month") {
-        return month()[0];
-      }
-      if (period == "custom") {
-        let parsestrDatefrom = dateFns.parse(
-          strDatefrom,
-          "dd.MM.yyyy",
-          new Date()
-        );
-        let dateFrom = parsestrDatefrom.getTime();
-        return dateFrom;
-      }
-    },
-
-    to: function () {
-      if (period == "day") {
-        return periodDay()[1];
-      }
-      if (period == "yesterday") {
-        return yesterday()[1];
-      }
-      if (period == "week") {
-        return startEndWeek()[1];
-      }
-      if (period == "month") {
-        return month()[1];
-      }
-      if (period == "custom") {
-        let parsestrDateTo = dateFns.parse(strDateto, "dd.MM.yyyy", new Date());
-        let dateTo = parsestrDateTo.getTime();
-
-        return dateTo;
-      }
-    },
-    manager_id: "",
-  },
-};
-
-let postDataManagers = {
-  type: "managers",
-  data: {},
-};
-
 function loadManagers() {
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -177,17 +136,42 @@ function loadManagers() {
   });
 }
 
+function loadID() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: "https://app.aaccent.su/jenyanour/my/companies_json.php",
+      method: "get",
+      dataType: "json",
+      data: {},
+      success: function (data) {
+        resolve(data);
+      },
+      error: function (error) {
+        reject(error);
+      },
+    });
+  });
+}
+function filterLeadsByManager(leads, managerId) {
+  const filteredData = leads.filter(
+    (item) => Number(item.responsible_id) === managerId
+  );
+
+  return filteredData;
+}
+
 function loadLeads(managerId) {
+  const queryParams = {
+    type: "filter_leads",
+
+    data: filterDateParams,
+  };
+
   return new Promise((resolve, reject) => {
     $.ajax({
       url: "https://app.aaccent.su/jenyanour/",
       type: "post",
-      data: {
-        type: "filter_leads",
-        data: {
-          manager_id: managerId,
-        },
-      },
+      data: queryParams,
       dataType: "json", // Expected response data type
       success: function (data) {
         resolve(data);
@@ -198,42 +182,29 @@ function loadLeads(managerId) {
     });
   });
 }
+function filterLeads(leadss, managerId) {
+  const filteredDatas = leadss.filter(
+    (item) => Number(item.company_responsible_id) == managerId
+  );
 
-function loadLeadsComplete(managerId) {
-  return new Promise((resolve, reject) => {
-    $.ajax({
-      url: "https://app.aaccent.su/jenyanour/",
-      type: "post",
-      data: {
-        type: "filter_complete_leads",
-        manager_id: managerId,
-      },
-      dataType: "json", // Expected response data type
-      success: function (data) {
-        resolve(data);
-      },
-      error: function (error) {
-        reject(error);
-      },
-    });
-  });
+  return filteredDatas;
 }
 
 function renderManagers(managers) {
   const fragment = $(document.createDocumentFragment());
 
   managers.forEach((manager, index) => {
-    const allLeadsCount = manager.leads.length + manager.completedLeads.length;
-    
+    const allLeadsCount = manager.allManagerLeads.length;
+
     const percentOfCompletedLeads = allLeadsCount
-      ? Math.round((manager.completedLeads.length * 100) / allLeadsCount)
+      ? Math.round((manager.leadsFilterCompany.length * 100) / allLeadsCount)
       : 0;
     const $row = $("<tr>");
     const $index = $("<td>").text(index + 1);
     const $name = $("<td>").text(manager.name);
-    const $leadsCount = $("<td>").text(manager.leads.length);
-    const $completedLeadsCount = $("<td>").text(manager.completedLeads.length);
-    const $allLeadsCount = $("<td>").text(allLeadsCount);
+    const $leadsCount = $("<td>").text(manager.leadsFilterCompany.length);
+    // const $completedLeadsCount = $("<td>").text(manager.completedLeads.length);
+    // const $allLeadsCount = $("<td>").text(allLeadsCount);
     const $percent = $("<td>").text(percentOfCompletedLeads + "%");
     // Общее кол-во - 100%
     // Кол-во завершн - x%
@@ -241,9 +212,9 @@ function renderManagers(managers) {
     const percentClosedLeads = $row
       .append($index)
       .append($name)
-      .append($allLeadsCount)
+      // .append($allLeadsCount)
       .append($leadsCount)
-      .append($completedLeadsCount)
+      // .append($completedLeadsCount)
       .append($percent);
 
     fragment.append($row);
@@ -254,117 +225,25 @@ function renderManagers(managers) {
 
 async function render() {
   const managers = await loadManagers();
-
+  const leads = await loadLeads();
+  // 1. загрузить все лиды
+  const allLeads = await loadID();
   const managersWithLeads = managers.map(async (manager) => {
-    const leads = await loadLeads(manager.id);
-    const completedLeads = await loadLeadsComplete(manager.id);
+    // отфильтолвать лиды по менеджеру
+
+    const allManagerLeads = filterLeadsByManager(allLeads, manager.id);
+
+    const leadsFilterCompany = filterLeads(leads, manager.id);
 
     return {
       ...manager,
-      leads,
-      completedLeads,
+      // leads,
+      allManagerLeads,
+      leadsFilterCompany,
     };
   });
-
   const results = await Promise.all(managersWithLeads);
-
-  // console.log(results);
-
+  console.log(results);
   renderManagers(results);
 }
-
 render();
-
-let ss;
-let test1;
-// $.ajax({
-//   url: "https://app.aaccent.su/jenyanour/",
-//   type: "post",
-//   data: postDataFilterDate,
-//   dataType: "json", // Expected response data type
-//   success: function (data) {
-//     $.ajax({
-//       url: "https://app.aaccent.su/jenyanour/",
-//       type: "post",
-//       data: postDataFilterDateComplete,
-//       dataType: "json", // Expected response data type
-//       success: function (data3) {
-//         $.ajax({
-//           url: "https://app.aaccent.su/jenyanour/",
-//           type: "post",
-//           data: postDataManagers,
-//           dataType: "json", // Expected response data type
-//           success: function (data2) {
-//             let leadCreatedAt = data.map((item) => item.lead_created_at);
-//             let leadResponsibleId = data.map(
-//               (item) => item.lead_responsible_id
-//             );
-//             let leadResponsibleIdDateComplete = data3.map(
-//               (item) => item.lead_responsible_id
-//             );
-//             console.log(leadResponsibleIdDateComplete);
-//             $.each(data2, function (index2, value2) {
-//               const leadResponsibleIdQuantity = leadResponsibleId.reduce(
-//                 (acc, i) => {
-//                   if (acc.hasOwnProperty(i)) {
-//                     acc[i] += 1;
-//                   } else {
-//                     acc[i] = 1;
-//                   }
-//                   return acc;
-//                 },
-//                 {}
-//               );
-//               const leadResponsibleIdDateCompleteQuantity =
-//                 leadResponsibleIdDateComplete.reduce((acc, i) => {
-//                   if (acc.hasOwnProperty(i)) {
-//                     acc[i] += 1;
-//                   } else {
-//                     acc[i] = 1;
-//                   }
-//                   return acc;
-//                 }, {});
-
-//               var row = $("<tr>");
-//               $(".table tbody").append(row);
-//               row.append($("<td>").text((index2 += 1)));
-//               row.append($("<td>").text(value2.name));
-
-//               for (const prop in leadResponsibleIdQuantity) {
-//                 if (prop == value2.id) {
-//                   row.append($("<td>").text(leadResponsibleIdQuantity[prop]));
-//                 }
-//               }
-//               for (const prop in leadResponsibleIdQuantity) {
-//                 for (const prop2 in leadResponsibleIdDateCompleteQuantity) {
-//                   if (prop == value2.id && prop2 == value2.id) {
-//                     row.append(
-//                       $("<td>").text(
-//                         ` ${
-//                           ((leadResponsibleIdDateCompleteQuantity[prop2] +
-//                             leadResponsibleIdQuantity[prop]) /
-//                             100) *
-//                           leadResponsibleIdQuantity[prop]
-//                         } %`
-//                       )
-//                     );
-//                   }
-//                 }
-//               }
-//             });
-//           },
-//           error: function (err) {
-//             console.log(err);
-//           },
-//         });
-//       },
-
-//       error: function (err) {
-//         console.log(err);
-//       },
-//     });
-//   },
-//   error: function (err) {
-//     console.log(err);
-//   },
-// });
