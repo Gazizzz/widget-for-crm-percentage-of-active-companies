@@ -192,32 +192,39 @@ function filterLeads(leadss, managerId) {
 
 function renderManagers(managers) {
   const fragment = $(document.createDocumentFragment());
-
+  let num = 0;
   managers.forEach((manager, index) => {
-    const allLeadsCount = manager.allManagerLeads.length;
+    if (
+      manager.name == "Евгения Ф. 8(909)886-75-17 (Кредитный специалист)" ||
+      manager.name == "Мариам А. 8(918)916-96-50 (Кредитный специалист)"
+    ) {
+      const allLeadsCount = manager.allManagerLeads.length;
 
-    const percentOfCompletedLeads = allLeadsCount
-      ? Math.round((manager.leadsFilterCompany.length * 100) / allLeadsCount)
-      : 0;
-    const $row = $("<tr>");
-    const $index = $("<td>").text(index + 1);
-    const $name = $("<td>").text(manager.name);
-    const $leadsCount = $("<td>").text(manager.leadsFilterCompany.length);
-    // const $completedLeadsCount = $("<td>").text(manager.completedLeads.length);
-    // const $allLeadsCount = $("<td>").text(allLeadsCount);
-    const $percent = $("<td>").text(percentOfCompletedLeads + "%");
-    // Общее кол-во - 100%
-    // Кол-во завершн - x%
+      const percentOfCompletedLeads = allLeadsCount
+        ? Math.round((manager.leadsFilterCompany.length * 100) / allLeadsCount)
+        : 0;
+      const $row = $("<tr>");
+      const $index = $("<td>").text((num = num + 1));
 
-    const percentClosedLeads = $row
-      .append($index)
-      .append($name)
-      // .append($allLeadsCount)
-      .append($leadsCount)
-      // .append($completedLeadsCount)
-      .append($percent);
+      const $name = $("<td>").text(manager.name);
 
-    fragment.append($row);
+      const $leadsCount = $("<td>").text(manager.leadsFilterCompany.length);
+      // const $completedLeadsCount = $("<td>").text(manager.completedLeads.length);
+      // const $allLeadsCount = $("<td>").text(allLeadsCount);
+      const $percent = $("<td>").text(percentOfCompletedLeads + "%");
+      // Общее кол-во - 100%
+      // Кол-во завершн - x%
+
+      const percentClosedLeads = $row
+        .append($index)
+        .append($name)
+        // .append($allLeadsCount)
+        .append($leadsCount)
+        // .append($completedLeadsCount)
+        .append($percent);
+
+      fragment.append($row);
+    }
   });
 
   $(".js-tbody").append(fragment);
