@@ -8,6 +8,7 @@ import {
   strDateto,
   url,
 } from "./helpers.js";
+import { fi } from "date-fns/locale";
 
 let precent;
 let thead = document.querySelector(".js-thead");
@@ -75,37 +76,12 @@ const currentDate = new Date();
 let currentQuater = findMonthQuarter(formattedDate);
 console.log(currentQuater);
 function quarterCurrent() {
-  if (currentQuater === 1) {
-    let dateFrom = new Date(`${currentDate.getFullYear()}-01-01`);
-    let timestamptDateFrom = dateFrom.getTime() / 1000;
-    console.log(timestamptDateFrom);
-    let dateTo = new Date(`${currentDate.getFullYear()}-03-31`);
+  let timestamptDateTo = Math.floor(currentDate.getTime() / 1000);
 
-    let timestamptDateTo = dateTo.getTime() / 1000;
+  let resultDate = dateFns.subDays(currentDate, 90);
+  let timestamptDateFrom = Math.floor(resultDate.getTime() / 1000);
 
-    return { timestamptDateFrom, timestamptDateTo };
-  }
-  if (currentQuater === 2) {
-    let dateFrom = new Date(`${currentDate.getFullYear()}-04-01`);
-    let timestamptDateFrom = dateFrom.getTime() / 1000;
-    let dateTo = new Date(`${currentDate.getFullYear()}-06-30`);
-    let timestamptDateTo = dateTo.getTime() / 1000;
-    return { timestamptDateFrom, timestamptDateTo };
-  }
-  if (currentQuater === 3) {
-    let dateFrom = new Date(`${currentDate.getFullYear()}-07-01`);
-    let timestamptDateFrom = dateFrom.getTime() / 1000;
-    let dateTo = new Date(`${currentDate.getFullYear()}-09-30`);
-    let timestamptDateTo = dateTo.getTime() / 1000;
-    return { timestamptDateFrom, timestamptDateTo };
-  }
-  if (currentQuater === 4) {
-    let dateFrom = new Date(`${currentDate.getFullYear()}-10-01`);
-    let timestamptDateFrom = dateFrom.getTime() / 1000;
-    let dateTo = new Date(`${currentDate.getFullYear()}-12-31`);
-    let timestamptDateTo = dateTo.getTime() / 1000;
-    return { timestamptDateFrom, timestamptDateTo };
-  }
+  return { timestamptDateFrom, timestamptDateTo };
 }
 
 let filterDateParams = {
@@ -131,7 +107,7 @@ function loadManagers() {
   });
 }
 
-function loadID() {
+function loadCompanies() {
   return new Promise((resolve, reject) => {
     $.ajax({
       url: "https://app.aaccent.su/jenyanour/my/companies_json.php",
@@ -177,6 +153,7 @@ function loadLeads(managerId) {
     });
   });
 }
+
 function filterLeads(leadss, managerId) {
   const filteredDatas = leadss.filter(
     (item) => Number(item.company_responsible_id) == managerId
@@ -194,16 +171,17 @@ function renderManagers(managers) {
       manager.name == "Мариам А. 8(918)916-96-50 (Кредитный специалист)"
     ) {
       const allLeadsCount = manager.allManagerLeads.length;
-
+      console.log(allLeadsCount);
       const percentOfCompletedLeads = allLeadsCount
-        ? Math.round((manager.leadsFilterCompany.length * 100) / allLeadsCount)
+        ? Math.round((manager.leadCount * 100) / allLeadsCount)
         : 0;
       const $row = $("<tr>");
+      // console.log(percentOfCompletedLeads);
       const $index = $("<td>").text((num = num + 1));
 
       const $name = $("<td>").text(manager.name);
 
-      const $leadsCount = $("<td>").text(manager.leadsFilterCompany.length);
+      const $leadsCount = $("<td>").text(manager.leadCount);
       // const $completedLeadsCount = $("<td>").text(manager.completedLeads.length);
       // const $allLeadsCount = $("<td>").text(allLeadsCount);
       const $percent = $("<td>").text(percentOfCompletedLeads + "%");
@@ -225,23 +203,59 @@ function renderManagers(managers) {
   $(".js-tbody").append(fragment);
 }
 
+function filterLeads2(leadss, ss) {
+  const filteredDatas = leadss.filter((item) => item.amo_company_id == ss);
+
+  return filteredDatas;
+}
+
 async function render() {
   const managers = await loadManagers();
   const leads = await loadLeads();
+  // console.log(leads);
   // 1. загрузить все лиды
-  const allLeads = await loadID();
+  const allCompanies = await loadCompanies();
+
+  const allLeadsWithCompanies = allCompanies.map((company) => {
+    const companyLeads = filterLeads2(leads, company.amo_id);
+
+    return {
+      ...company,
+      companyLeads,
+    };
+  });
+
+  const firstManager = "9206253";
+  const secondManage = "6889038";
+
   const managersWithLeads = managers.map(async (manager) => {
     // отфильтолвать лиды по менеджеру
 
-    const allManagerLeads = filterLeadsByManager(allLeads, manager.id);
+    const allManagerLeads = filterLeadsByManager(allCompanies, manager.id);
 
     const leadsFilterCompany = filterLeads(leads, manager.id);
+    const filteredCompaniesByManager = allLeadsWithCompanies.filter(
+      (company) => {
+        return (
+          company.companyLeads.length > 0 &&
+          (company.responsible_id == firstManager ||
+            company.responsible_id == secondManage)
+        );
+      }
+    );
+    const leadCount = filteredCompaniesByManager.reduce((acc, curr) => {
+      if (curr.responsible_id == manager.id) {
+        acc = acc + 1;
+      }
 
+      return acc;
+    }, 0);
     return {
       ...manager,
       // leads,
       allManagerLeads,
       leadsFilterCompany,
+      leadCount,
     };
   });
   const results = await Promise.all(managersWithLeads);
