@@ -76,39 +76,34 @@ let currentQuater = findMonthQuarter(formattedDate);
 console.log(currentQuater);
 function quarterCurrent() {
   if (currentQuater === 1) {
-    let dateFrom = new Date(currentDate.getFullYear(), 0, 1);
+    let dateFrom = new Date(`${currentDate.getFullYear()}-01-01`);
     let timestamptDateFrom = dateFrom.getTime() / 1000;
+    console.log(timestamptDateFrom);
+    let dateTo = new Date(`${currentDate.getFullYear()}-03-31`);
 
-    let dateTo = new Date(currentDate.getFullYear(), 2, 31);
     let timestamptDateTo = dateTo.getTime() / 1000;
 
     return { timestamptDateFrom, timestamptDateTo };
   }
   if (currentQuater === 2) {
-    let dateFrom = new Date(currentDate.getFullYear(), 3, 1);
+    let dateFrom = new Date(`${currentDate.getFullYear()}-04-01`);
     let timestamptDateFrom = dateFrom.getTime() / 1000;
-
-    let dateTo = new Date(currentDate.getFullYear(), 5, 30);
+    let dateTo = new Date(`${currentDate.getFullYear()}-06-30`);
     let timestamptDateTo = dateTo.getTime() / 1000;
-
     return { timestamptDateFrom, timestamptDateTo };
   }
   if (currentQuater === 3) {
-    let dateFrom = new Date(currentDate.getFullYear(), 6, 1);
+    let dateFrom = new Date(`${currentDate.getFullYear()}-07-01`);
     let timestamptDateFrom = dateFrom.getTime() / 1000;
-
-    let dateTo = new Date(currentDate.getFullYear(), 8, 30);
+    let dateTo = new Date(`${currentDate.getFullYear()}-09-30`);
     let timestamptDateTo = dateTo.getTime() / 1000;
-
     return { timestamptDateFrom, timestamptDateTo };
   }
   if (currentQuater === 4) {
-    let dateFrom = new Date(currentDate.getFullYear(), 9, 1);
+    let dateFrom = new Date(`${currentDate.getFullYear()}-10-01`);
     let timestamptDateFrom = dateFrom.getTime() / 1000;
-
-    let dateTo = new Date(currentDate.getFullYear(), 11, 31);
+    let dateTo = new Date(`${currentDate.getFullYear()}-12-31`);
     let timestamptDateTo = dateTo.getTime() / 1000;
-
     return { timestamptDateFrom, timestamptDateTo };
   }
 }
