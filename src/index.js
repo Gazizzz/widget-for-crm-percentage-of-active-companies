@@ -203,8 +203,8 @@ function renderManagers(managers) {
   $(".js-tbody").append(fragment);
 }
 
-function filterLeads2(leadss, ss) {
-  const filteredDatas = leadss.filter((item) => item.amo_company_id == ss);
+function filterLeads2(leadss, amo_id) {
+  const filteredDatas = leadss.filter((item) => item.amo_company_id == amo_id);
 
   return filteredDatas;
 }
