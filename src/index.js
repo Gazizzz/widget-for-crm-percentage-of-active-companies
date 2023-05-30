@@ -9,7 +9,6 @@ import {
   url,
 } from "./helpers.js";
 import { fi } from "date-fns/locale";
-
 let precent;
 let thead = document.querySelector(".js-thead");
 let tbody = document.querySelector(".js-tbody");
@@ -74,7 +73,7 @@ const period = url.searchParams.get("period");
 
 const currentDate = new Date();
 let currentQuater = findMonthQuarter(formattedDate);
-console.log(currentQuater);
+
 function quarterCurrent() {
   let timestamptDateTo = Math.floor(currentDate.getTime() / 1000);
 
@@ -171,20 +170,35 @@ function renderManagers(managers) {
       manager.name == "Мариам А. 8(918)916-96-50 (Кредитный специалист)"
     ) {
       const allLeadsCount = manager.allManagerLeads.length;
-      console.log(allLeadsCount);
+
       const percentOfCompletedLeads = allLeadsCount
         ? Math.round((manager.leadCount * 100) / allLeadsCount)
         : 0;
       const $row = $("<tr>");
-      // console.log(percentOfCompletedLeads);
+
       const $index = $("<td>").text((num = num + 1));
 
       const $name = $("<td>").text(manager.name);
 
       const $leadsCount = $("<td>").text(manager.leadCount);
+
+      if (manager.id == "6889038") {
+        $leadsCount.addClass("js-button-firstUser");
+        $leadsCount.attr("data-bs-toggle", "modal");
+        $leadsCount.attr("data-bs-target", "#firstModal");
+      }
+      if (manager.id == "9206253") {
+        $leadsCount.addClass("js-button-secondUser");
+        $leadsCount.attr("data-bs-toggle", "modal");
+        $leadsCount.attr("data-bs-target", "#exampleModal");
+      }
       // const $completedLeadsCount = $("<td>").text(manager.completedLeads.length);
       // const $allLeadsCount = $("<td>").text(allLeadsCount);
       const $percent = $("<td>").text(percentOfCompletedLeads + "%");
+      $percent.addClass("js-Center");
+      const $names = $("<td>").text(manager.nameCompany);
+      // console.log(manager.test);
+      // console.log($names);
       // Общее кол-во - 100%
       // Кол-во завершн - x%
 
@@ -194,7 +208,8 @@ function renderManagers(managers) {
         // .append($allLeadsCount)
         .append($leadsCount)
         // .append($completedLeadsCount)
-        .append($percent);
+        .append($percent)
+        .append($names);
 
       fragment.append($row);
     }
@@ -202,6 +217,8 @@ function renderManagers(managers) {
 
   $(".js-tbody").append(fragment);
 }
+
+//
 
 function filterLeads2(leadss, amo_id) {
   const filteredDatas = leadss.filter((item) => item.amo_company_id == amo_id);
@@ -227,7 +244,37 @@ async function render() {
 
   const firstManager = "9206253";
   const secondManage = "6889038";
+  const filteredCompaniesByManager2 = allLeadsWithCompanies.filter(
+    (company) => {
+      return (
+        company.companyLeads.length > 0 &&
+        (company.responsible_id == firstManager ||
+          company.responsible_id == secondManage)
+      );
+    }
+  );
+  const nameCompanyFirstUser = filteredCompaniesByManager2.map((item) => {
+    if (item.responsible_id == "6889038") {
+      let companyName = item.name;
+      let companyAmoId = item.amo_id;
+      return { companyName, companyAmoId };
+    }
+  });
+  const filteredFirstUser = nameCompanyFirstUser.filter(function (el) {
+    return el != null;
+  });
 
+  const nameCompanySecondtUser = filteredCompaniesByManager2.map((item) => {
+    if (item.responsible_id == "9206253") {
+      let companyName = item.name;
+      let companyAmoId = item.amo_id;
+      return { companyName, companyAmoId };
+    }
+  });
+
+  const filteredSecondtUser = nameCompanySecondtUser.filter(function (el) {
+    return el != null;
+  });
   const managersWithLeads = managers.map(async (manager) => {
     // отфильтолвать лиды по менеджеру
 
@@ -243,6 +290,7 @@ async function render() {
         );
       }
     );
+
     const leadCount = filteredCompaniesByManager.reduce((acc, curr) => {
       if (curr.responsible_id == manager.id) {
         acc = acc + 1;
@@ -250,16 +298,118 @@ async function render() {
 
       return acc;
     }, 0);
+
     return {
       ...manager,
-      // leads,
       allManagerLeads,
       leadsFilterCompany,
       leadCount,
+      filteredCompaniesByManager,
     };
   });
+
   const results = await Promise.all(managersWithLeads);
   console.log(results);
   renderManagers(results);
+
+  const firstUserButton = document.querySelector(".js-button-firstUser");
+  const secondUserButton = document.querySelector(".js-button-secondUser");
+  const centerStyle = document.querySelectorAll(".js-Center");
+  firstUserButton.style.textAlign = "center";
+
+  centerStyle.forEach((element) => {
+    element.style.textAlign = "center";
+  });
+  secondUserButton.style.textAlign = "center";
+  // firstUserButton.addEventListener("click", (event) => {
+  const table = document.querySelector("#myTable");
+  filteredFirstUser.forEach((element, index) => {
+    const row = document.createElement("tr");
+    const companyNumber = document.createElement("td");
+    const companyName = document.createElement("td");
+    const companyAmoId = document.createElement("td");
+    companyAmoId.classList = "companyID";
+    companyNumber.textContent = `${index + 1} .`;
+    companyName.textContent = element.companyName;
+    companyAmoId.textContent = element.companyAmoId;
+    companyAmoId.style.color = "blue";
+    companyAmoId.style.cursor = "pointer";
+    table.addEventListener("click", (event) => {
+      if (event.target.classList.contains("companyID")) {
+        event.preventDefault();
+        // console.log(event.target);
+        const companyIdTarget = event.target.innerText;
+        console.log(companyIdTarget);
+        window.open(
+          `https://jenyanour.amocrm.ru/companies/detail/${companyIdTarget}`,
+          "_blank"
+        );
+      }
+    });
+    // let amoId = document.querySelectorAll(".companyID");
+    // amoId.forEach((item) => {
+    //   item.addEventListener("click", followinglink);
+    //   function followinglink(event) {
+    //     const companyIdTarget = event.target.innerText;
+
+    //     window.open(
+    //       `https://jenyanour.amocrm.ru/companies/detail/${companyIdTarget}`,
+    //       "_blank"
+    //     );
+    //   }
+    // });
+
+    row.append(companyNumber);
+    row.append(companyName);
+    row.append(companyAmoId);
+    table.appendChild(row);
+  }); // });
+
+  // // secondUserButton.addEventListener("click", (event) => {
+
+  // // });
+  const tableSecond = document.querySelector("#myTableSecond");
+  filteredSecondtUser.forEach((element, index) => {
+    const row = document.createElement("tr");
+    const companyNumber = document.createElement("td");
+    const companyName = document.createElement("td");
+    const companyAmoId = document.createElement("td");
+    companyAmoId.classList = "companyIDSecond";
+    companyNumber.textContent = `${index + 1} .`;
+    companyName.textContent = element.companyName;
+    companyAmoId.textContent = element.companyAmoId;
+    companyAmoId.style.color = "blue";
+    companyAmoId.style.cursor = "pointer";
+
+    tableSecond.addEventListener("click", (event) => {
+      if (event.target.classList.contains("companyIDSecond")) {
+        event.preventDefault();
+        // console.log(event.target);
+        const companyIdTarget = event.target.innerText;
+        console.log(companyIdTarget);
+        window.open(
+          `https://jenyanour.amocrm.ru/companies/detail/${companyIdTarget}`,
+          "_blank"
+        );
+      }
+    });
+    // let amoId = document.querySelectorAll(".companyIDSecond");
+    // amoId.forEach((item) => {
+    //   item.addEventListener("click", followinglink);
+    //   function followinglink(event) {
+    //     const companyIdTarget = event.target.innerText;
+    //     console.log(companyIdTarget);
+    //     window.open(
+    //       `https://jenyanour.amocrm.ru/companies/detail/${companyIdTarget}`,
+    //       "_blank"
+    //     );
+    //   }
+    // });
+
+    row.append(companyNumber);
+    row.append(companyName);
+    row.append(companyAmoId);
+    tableSecond.appendChild(row);
+  });
 }
 render();
