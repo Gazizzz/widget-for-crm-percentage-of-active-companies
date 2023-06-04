@@ -47,13 +47,64 @@
           </div>
           <div class="modal-body" style="overflow-y: auto">
             <div class="first_user">
-              <table id="myTable">
-                <tr>
-                  <th style="padding-right: 40px">#</th>
-                  <th>Название</th>
-                </tr>
-                <tr></tr>
-              </table>
+              <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                  <button
+                    class="nav-link active"
+                    id="nav-home-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#nav-home"
+                    type="button"
+                    role="tab"
+                    aria-controls="nav-home"
+                    aria-selected="true"
+                  >
+                    Активные
+                  </button>
+                  <button
+                    class="nav-link"
+                    id="nav-profile-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#nav-profile"
+                    type="button"
+                    role="tab"
+                    aria-controls="nav-profile"
+                    aria-selected="false"
+                  >
+                    Неактивные
+                  </button>
+                </div>
+              </nav>
+              <div class="tab-content" id="nav-tabContent">
+                <div
+                  class="tab-pane fade show active"
+                  id="nav-home"
+                  role="tabpanel"
+                  aria-labelledby="nav-home-tab"
+                  tabindex="0"
+                >
+                  <table id="activeCompanyFirstTable">
+                    <tr>
+                      <th style="padding-right: 40px">#</th>
+                      <th>Название</th>
+                    </tr>
+                  </table>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="nav-profile"
+                  role="tabpanel"
+                  aria-labelledby="nav-profile-tab"
+                  tabindex="0"
+                >
+                  <table id="inactiveCompanyFirstTable">
+                    <tr>
+                      <th style="padding-right: 40px">#</th>
+                      <th>Название</th>
+                    </tr>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -93,27 +144,31 @@
           </div>
           <div class="modal-body" style="overflow-y: auto">
             <div class="ff">
-              <table id="myTableSecond">
-                <tr>
-                  <th style="padding-right: 40px">#</th>
-                  <th>Название</th>
-                </tr>
-                <tr></tr>
-              </table>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Закрыть
-            </button>
-          </div>
-        </div>
+              <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                
+                  <button class="nav-link active" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="true">Активные</button>
+                  <button class="nav-link" id="nav-inactiveCompanySecondTable-tab" data-bs-toggle="tab" data-bs-target="#nav-inactiveCompanySecondTable" type="button" role="tab" aria-controls="nav-inactiveCompanySecondTable" aria-selected="false">Неактивные</button> 
+                </div>
+              </nav>
+              <div class="tab-content" id="nav-tabContent">           
+                <div class="tab-pane fade show active" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab" tabindex="0"><table id="myTableSecond">
+                  <tr>
+                    <th style="padding-right: 40px">#</th>
+                    <th>Название</th>
+                  </tr>
+                  <tr></tr>
+                </table></div>
+                <div class="tab-pane fade" id="nav-inactiveCompanySecondTable" role="tabpanel" aria-labelledby="nav-inactiveCompanySecondTable-tab" tabindex="0"> <table id="inactiveCompanySecondTable">
+                  <tr>
+                    <th style="padding-right: 40px">#</th>
+                    <th>Название</th>
+                  </tr>
+                </table> </div> 
+              </div>
       </div>
     </div>
+
     <div id="column"></div>
     <script src="https://unpkg.com/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src=" 
@@ -121,3 +176,16 @@
     "></script>
   </body>
 </html>
+<!-- <table id="myTableSecond">
+                  <tr>
+                    <th style="padding-right: 40px">#</th>
+                    <th>Название</th>
+                  </tr>
+                  <tr></tr>
+                </table> -->
+                <!-- <table id="inactiveCompanySecondTable">
+                  <tr>
+                    <th style="padding-right: 40px">#</th>
+                    <th>Название</th>
+                  </tr>
+                </table> -->

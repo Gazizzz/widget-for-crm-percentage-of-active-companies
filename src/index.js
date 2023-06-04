@@ -244,7 +244,7 @@ async function render() {
 
   const firstManager = "9206253";
   const secondManage = "6889038";
-  const filteredCompaniesByManager2 = allLeadsWithCompanies.filter(
+  const filteredActiveCompaniesByManager = allLeadsWithCompanies.filter(
     (company) => {
       return (
         company.companyLeads.length > 0 &&
@@ -253,28 +253,73 @@ async function render() {
       );
     }
   );
-  const nameCompanyFirstUser = filteredCompaniesByManager2.map((item) => {
+
+  const nameCompanyFirstUser = filteredActiveCompaniesByManager.map((item) => {
     if (item.responsible_id == "6889038") {
       let companyName = item.name;
       let companyAmoId = item.amo_id;
       return { companyName, companyAmoId };
     }
   });
+
   const filteredFirstUser = nameCompanyFirstUser.filter(function (el) {
     return el != null;
   });
 
-  const nameCompanySecondtUser = filteredCompaniesByManager2.map((item) => {
-    if (item.responsible_id == "9206253") {
-      let companyName = item.name;
-      let companyAmoId = item.amo_id;
-      return { companyName, companyAmoId };
+  const nameCompanySecondtUser = filteredActiveCompaniesByManager.map(
+    (item) => {
+      if (item.responsible_id == "9206253") {
+        let companyName = item.name;
+        let companyAmoId = item.amo_id;
+        return { companyName, companyAmoId };
+      }
     }
-  });
+  );
 
   const filteredSecondtUser = nameCompanySecondtUser.filter(function (el) {
     return el != null;
   });
+
+  const filteredInactiveCompaniesByManager = allLeadsWithCompanies.filter(
+    (company) => {
+      return (
+        company.companyLeads.length == 0 &&
+        (company.responsible_id == firstManager ||
+          company.responsible_id == secondManage)
+      );
+    }
+  );
+  const nameInactiveCompanyFirstUser = filteredInactiveCompaniesByManager.map(
+    (item) => {
+      if (item.responsible_id == "6889038") {
+        let companyName = item.name;
+        let companyAmoId = item.amo_id;
+        return { companyName, companyAmoId };
+      }
+    }
+  );
+
+  const filteredInactiveFirstUser = nameInactiveCompanyFirstUser.filter(
+    function (el) {
+      return el != null;
+    }
+  );
+  const nameInactiveCompanySecondUser = filteredInactiveCompaniesByManager.map(
+    (item) => {
+      if (item.responsible_id == "9206253") {
+        let companyName = item.name;
+        let companyAmoId = item.amo_id;
+        return { companyName, companyAmoId };
+      }
+    }
+  );
+
+  const filteredInactiveSecondUser = nameInactiveCompanySecondUser.filter(
+    function (el) {
+      return el != null;
+    }
+  );
+
   const managersWithLeads = managers.map(async (manager) => {
     // отфильтолвать лиды по менеджеру
 
@@ -304,7 +349,6 @@ async function render() {
       allManagerLeads,
       leadsFilterCompany,
       leadCount,
-      filteredCompaniesByManager,
     };
   });
 
@@ -321,20 +365,26 @@ async function render() {
     element.style.textAlign = "center";
   });
   secondUserButton.style.textAlign = "center";
-  // firstUserButton.addEventListener("click", (event) => {
-  const table = document.querySelector("#myTable");
+
+  const activeCompanyFirstTable = document.querySelector(
+    "#activeCompanyFirstTable"
+  );
+  const inactiveCompanyFirstTable = document.querySelector(
+    "#inactiveCompanyFirstTable"
+  );
+
   filteredFirstUser.forEach((element, index) => {
-    const row = document.createElement("tr");
-    const companyNumber = document.createElement("td");
-    const companyName = document.createElement("td");
-    const companyAmoId = document.createElement("td");
-    companyAmoId.classList = "companyID";
-    companyNumber.textContent = `${index + 1} .`;
-    companyName.textContent = element.companyName;
-    companyAmoId.textContent = element.companyAmoId;
-    companyAmoId.style.color = "blue";
-    companyAmoId.style.cursor = "pointer";
-    table.addEventListener("click", (event) => {
+    const activeCompanyRow = document.createElement("tr");
+    const activeCompanyNumber = document.createElement("td");
+    const activeCompanyName = document.createElement("td");
+    const activeCompanyAmoId = document.createElement("td");
+    activeCompanyAmoId.classList = "companyID";
+    activeCompanyNumber.textContent = `${index + 1} .`;
+    activeCompanyName.textContent = element.companyName;
+    activeCompanyAmoId.textContent = element.companyAmoId;
+    activeCompanyAmoId.style.color = "blue";
+    activeCompanyAmoId.style.cursor = "pointer";
+    activeCompanyFirstTable.addEventListener("click", (event) => {
       if (event.target.classList.contains("companyID")) {
         event.preventDefault();
         // console.log(event.target);
@@ -346,6 +396,7 @@ async function render() {
         );
       }
     });
+
     // let amoId = document.querySelectorAll(".companyID");
     // amoId.forEach((item) => {
     //   item.addEventListener("click", followinglink);
@@ -359,16 +410,48 @@ async function render() {
     //   }
     // });
 
-    row.append(companyNumber);
-    row.append(companyName);
-    row.append(companyAmoId);
-    table.appendChild(row);
-  }); // });
+    activeCompanyRow.append(activeCompanyNumber);
+    activeCompanyRow.append(activeCompanyName);
+    activeCompanyRow.append(activeCompanyAmoId);
+    activeCompanyFirstTable.append(activeCompanyRow);
+  });
 
-  // // secondUserButton.addEventListener("click", (event) => {
+  filteredInactiveFirstUser.forEach((element, index) => {
+    const CompanyRow = document.createElement("tr");
+    const CompanyNumber = document.createElement("td");
+    const CompanyName = document.createElement("td");
+    const CompanyAmoId = document.createElement("td");
+    CompanyAmoId.classList = "inactivecompanyID";
+    CompanyNumber.textContent = `${index + 1} .`;
+    CompanyName.textContent = element.companyName;
+    CompanyAmoId.textContent = element.companyAmoId;
+    CompanyAmoId.style.color = "blue";
+    CompanyAmoId.style.cursor = "pointer";
+    inactiveCompanyFirstTable.addEventListener("click", (event) => {
+      if (event.target.classList.contains("inactivecompanyID")) {
+        event.preventDefault();
+        // console.log(event.target);
+        const companyIdTarget = event.target.innerText;
+        console.log(companyIdTarget);
+        window.open(
+          `https://jenyanour.amocrm.ru/companies/detail/${companyIdTarget}`,
+          "_blank"
+        );
+      }
+    });
 
-  // // });
+    CompanyRow.append(CompanyNumber);
+    CompanyRow.append(CompanyName);
+    CompanyRow.append(CompanyAmoId);
+    inactiveCompanyFirstTable.append(CompanyRow);
+  });
+
+  // Второй модальник
   const tableSecond = document.querySelector("#myTableSecond");
+  const inactiveCompanySecondTable = document.querySelector(
+    "#inactiveCompanySecondTable"
+  );
+
   filteredSecondtUser.forEach((element, index) => {
     const row = document.createElement("tr");
     const companyNumber = document.createElement("td");
@@ -380,13 +463,10 @@ async function render() {
     companyAmoId.textContent = element.companyAmoId;
     companyAmoId.style.color = "blue";
     companyAmoId.style.cursor = "pointer";
-
     tableSecond.addEventListener("click", (event) => {
       if (event.target.classList.contains("companyIDSecond")) {
         event.preventDefault();
-        // console.log(event.target);
         const companyIdTarget = event.target.innerText;
-        console.log(companyIdTarget);
         window.open(
           `https://jenyanour.amocrm.ru/companies/detail/${companyIdTarget}`,
           "_blank"
@@ -410,6 +490,35 @@ async function render() {
     row.append(companyName);
     row.append(companyAmoId);
     tableSecond.appendChild(row);
+  });
+  filteredInactiveSecondUser.forEach((element, index) => {
+    const CompanyRow = document.createElement("tr");
+    const CompanyNumber = document.createElement("td");
+    const CompanyName = document.createElement("td");
+    const CompanyAmoId = document.createElement("td");
+    CompanyAmoId.classList = "inactivecompanySecondID";
+    CompanyNumber.textContent = `${index + 1} .`;
+    CompanyName.textContent = element.companyName;
+    CompanyAmoId.textContent = element.companyAmoId;
+    CompanyAmoId.style.color = "blue";
+    CompanyAmoId.style.cursor = "pointer";
+    inactiveCompanySecondTable.addEventListener("click", (event) => {
+      if (event.target.classList.contains("inactivecompanySecondID")) {
+        event.preventDefault();
+        // console.log(event.target);
+        const companyIdTarget = event.target.innerText;
+        console.log(companyIdTarget);
+        window.open(
+          `https://jenyanour.amocrm.ru/companies/detail/${companyIdTarget}`,
+          "_blank"
+        );
+      }
+    });
+
+    CompanyRow.append(CompanyNumber);
+    CompanyRow.append(CompanyName);
+    CompanyRow.append(CompanyAmoId);
+    inactiveCompanySecondTable.append(CompanyRow);
   });
 }
 render();
