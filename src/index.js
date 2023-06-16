@@ -71,13 +71,21 @@ function findMonthQuarter(date) {
 
 const period = url.searchParams.get("period");
 
-const currentDate = new Date();
-let currentQuater = findMonthQuarter(formattedDate);
+// const currentDate = new Date();
+// let currentQuater = findMonthQuarter(formattedDate);
+let periodNinetyDays = new Date();
+periodNinetyDays.setHours(0);
+periodNinetyDays.setMinutes(0);
+periodNinetyDays.setSeconds(0);
 
 function quarterCurrent() {
-  let timestamptDateTo = Math.floor(currentDate.getTime() / 1000);
+  let periodNinetyDayEnd = new Date();
+  periodNinetyDayEnd.setHours(0);
+  periodNinetyDayEnd.setMinutes(59);
+  periodNinetyDayEnd.setSeconds(59);
+  let timestamptDateTo = Math.floor(periodNinetyDayEnd.getTime() / 1000);
 
-  let resultDate = dateFns.subDays(currentDate, 90);
+  let resultDate = dateFns.subDays(periodNinetyDays, 90);
   let timestamptDateFrom = Math.floor(resultDate.getTime() / 1000);
 
   return { timestamptDateFrom, timestamptDateTo };
